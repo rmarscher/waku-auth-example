@@ -1,7 +1,7 @@
 import { betterAuth, BetterAuthPlugin } from "better-auth";
 import { createAuthMiddleware } from "better-auth/api";
 import Database from "better-sqlite3";
-import { getContextData } from "waku/middleware/context";
+import { getContext, getContextData } from "waku/middleware/context";
 import { Session } from "./lib/auth-client";
 
 // Other database adapters and options are available
@@ -43,7 +43,18 @@ export function wakuCookies() {
   } satisfies BetterAuthPlugin;
 }
 
-export const getSession = async () =>
-  (await getContextData().sessionPromise) as
-    | Promise<Session | undefined>
+export function getSession(): Promise<Session | null> {
+  const contextData = getContextData();
+  const ctx = getContext();
+  const existingSessionPromise = contextData.sessionPromise as
+    | Promise<Session | null>
     | undefined;
+  if (existingSessionPromise) {
+    return existingSessionPromise;
+  }
+  const sessionPromise = auth.api.getSession({
+    headers: new Headers(ctx.req.headers),
+  });
+  contextData.sessionPromise = sessionPromise;
+  return sessionPromise;
+}
