@@ -1,4 +1,4 @@
-# Waku Auth Example
+# Waku "Better Auth" Example
 
 This is an example of implementing authentication in Waku using [better-auth](https://www.better-auth.com/docs/installation).
 
