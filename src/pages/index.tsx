@@ -2,11 +2,11 @@ import { Link } from "waku";
 
 import { Counter } from "../components/counter";
 import { AuthForms } from "../components/auth-forms";
-import { getContextData } from "waku/middleware/context";
+import { getSession } from "@/auth";
 
 export default async function HomePage() {
   const data = await getData();
-  const session = getContextData().session;
+  const session = await getSession();
 
   // If signed in, show main content
   return (

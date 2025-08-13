@@ -1,8 +1,8 @@
+import { getSession } from "@/auth";
 import { Link } from "waku";
-import { getContextData } from "waku/middleware/context";
 
 export default async function AboutPage() {
-  const session = getContextData().session;
+  const session = await getSession();
   if (!session) {
     return null;
   }

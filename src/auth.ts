@@ -1,5 +1,8 @@
-import { betterAuth } from "better-auth";
+import { betterAuth, BetterAuthPlugin } from "better-auth";
+import { createAuthMiddleware } from "better-auth/api";
 import Database from "better-sqlite3";
+import { getContextData } from "waku/middleware/context";
+import { Session } from "./lib/auth-client";
 
 // Other database adapters and options are available
 // https://www.better-auth.com/docs/installation#configure-database
@@ -8,4 +11,39 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
+  plugins: [wakuCookies()],
 });
+
+export function wakuCookies() {
+  return {
+    id: "waku-cookies",
+    hooks: {
+      after: [
+        {
+          matcher(ctx) {
+            return true;
+          },
+          handler: createAuthMiddleware(async (ctx) => {
+            const returned = ctx.context.responseHeaders;
+            if ("_flag" in ctx && ctx._flag === "router") {
+              return;
+            }
+            if (returned instanceof Headers) {
+              console.log("Returned headers", Array.from(returned));
+              const setCookieHeader = returned?.get("set-cookie");
+              if (!setCookieHeader) return;
+              const contextData = getContextData();
+              contextData.betterAuthSetCookie = setCookieHeader;
+              console.log("Set betterAuthSetCookie");
+            }
+          }),
+        },
+      ],
+    },
+  } satisfies BetterAuthPlugin;
+}
+
+export const getSession = async () =>
+  (await getContextData().sessionPromise) as
+    | Promise<Session | undefined>
+    | undefined;

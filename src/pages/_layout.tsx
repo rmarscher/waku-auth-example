@@ -4,14 +4,13 @@ import { Suspense, type ReactNode } from "react";
 
 import { Header } from "../components/header";
 import { Footer } from "../components/footer";
-import { getContextData } from "waku/middleware/context";
-import { Session } from "@/lib/auth-client";
+import { getSession } from "@/auth";
 
 type RootLayoutProps = { children: ReactNode };
 
 export default async function RootLayout({ children }: RootLayoutProps) {
   const data = await getData();
-  const session = getContextData().session as Session | undefined;
+  const session = await getSession();
   console.log("Session in layout:", session);
 
   return (

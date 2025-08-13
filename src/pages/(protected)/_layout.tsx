@@ -1,13 +1,12 @@
 import { Suspense, type ReactNode } from "react";
 import { Link } from "waku";
-import { getContextData } from "waku/middleware/context";
-import { Session } from "@/lib/auth-client";
 import { AuthForms } from "@/components/auth-forms";
+import { getSession } from "@/auth";
 
 type RootLayoutProps = { children: ReactNode };
 
 export default async function ProtectedLayout({ children }: RootLayoutProps) {
-  const session = getContextData().session as Session | undefined;
+  const session = await getSession();
   if (!session) {
     return (
       <div>
