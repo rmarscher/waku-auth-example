@@ -1,6 +1,11 @@
-import { Link } from 'waku';
+import { Link } from "waku";
+import { getContextData } from "waku/middleware/context";
 
 export default async function AboutPage() {
+  const session = getContextData().session;
+  if (!session) {
+    return null;
+  }
   const data = await getData();
 
   return (
@@ -17,9 +22,9 @@ export default async function AboutPage() {
 
 const getData = async () => {
   const data = {
-    title: 'About',
-    headline: 'About Waku',
-    body: 'The minimal React framework',
+    title: "About",
+    headline: "About Waku",
+    body: "The minimal React framework",
   };
 
   return data;
@@ -27,6 +32,6 @@ const getData = async () => {
 
 export const getConfig = async () => {
   return {
-    render: 'static',
+    render: "static",
   } as const;
 };
